@@ -13,12 +13,12 @@
 //==============================================================================
 /**
 */
-class AudioMidiRecorderPluginProcessor  : public juce::AudioProcessor
+class DinvernoAudioMidiRecorderPluginProcessor  : public juce::AudioProcessor
 {
 public:
     //==============================================================================
-    AudioMidiRecorderPluginProcessor();
-    ~AudioMidiRecorderPluginProcessor() override;
+    DinvernoAudioMidiRecorderPluginProcessor();
+    ~DinvernoAudioMidiRecorderPluginProcessor() override;
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -79,5 +79,5 @@ private:
 
     
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioMidiRecorderPluginProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DinvernoAudioMidiRecorderPluginProcessor)
 };

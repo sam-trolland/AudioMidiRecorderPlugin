@@ -10,7 +10,7 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-AudioMidiRecorderPluginProcessor::AudioMidiRecorderPluginProcessor()
+DinvernoAudioMidiRecorderPluginProcessor::DinvernoAudioMidiRecorderPluginProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
@@ -30,17 +30,17 @@ AudioMidiRecorderPluginProcessor::AudioMidiRecorderPluginProcessor()
     recordingTime = 0;
 }
 
-AudioMidiRecorderPluginProcessor::~AudioMidiRecorderPluginProcessor()
+DinvernoAudioMidiRecorderPluginProcessor::~DinvernoAudioMidiRecorderPluginProcessor()
 {
 }
 
 //==============================================================================
-const juce::String AudioMidiRecorderPluginProcessor::getName() const
+const juce::String DinvernoAudioMidiRecorderPluginProcessor::getName() const
 {
     return JucePlugin_Name;
 }
 
-bool AudioMidiRecorderPluginProcessor::acceptsMidi() const
+bool DinvernoAudioMidiRecorderPluginProcessor::acceptsMidi() const
 {
    #if JucePlugin_WantsMidiInput
     return true;
@@ -49,7 +49,7 @@ bool AudioMidiRecorderPluginProcessor::acceptsMidi() const
    #endif
 }
 
-bool AudioMidiRecorderPluginProcessor::producesMidi() const
+bool DinvernoAudioMidiRecorderPluginProcessor::producesMidi() const
 {
    #if JucePlugin_ProducesMidiOutput
     return true;
@@ -58,7 +58,7 @@ bool AudioMidiRecorderPluginProcessor::producesMidi() const
    #endif
 }
 
-bool AudioMidiRecorderPluginProcessor::isMidiEffect() const
+bool DinvernoAudioMidiRecorderPluginProcessor::isMidiEffect() const
 {
    #if JucePlugin_IsMidiEffect
     return true;
@@ -67,37 +67,37 @@ bool AudioMidiRecorderPluginProcessor::isMidiEffect() const
    #endif
 }
 
-double AudioMidiRecorderPluginProcessor::getTailLengthSeconds() const
+double DinvernoAudioMidiRecorderPluginProcessor::getTailLengthSeconds() const
 {
     return 0.0;
 }
 
-int AudioMidiRecorderPluginProcessor::getNumPrograms()
+int DinvernoAudioMidiRecorderPluginProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
                 // so this should be at least 1, even if you're not really implementing programs.
 }
 
-int AudioMidiRecorderPluginProcessor::getCurrentProgram()
+int DinvernoAudioMidiRecorderPluginProcessor::getCurrentProgram()
 {
     return 0;
 }
 
-void AudioMidiRecorderPluginProcessor::setCurrentProgram (int index)
+void DinvernoAudioMidiRecorderPluginProcessor::setCurrentProgram (int index)
 {
 }
 
-const juce::String AudioMidiRecorderPluginProcessor::getProgramName (int index)
+const juce::String DinvernoAudioMidiRecorderPluginProcessor::getProgramName (int index)
 {
     return {};
 }
 
-void AudioMidiRecorderPluginProcessor::changeProgramName (int index, const juce::String& newName)
+void DinvernoAudioMidiRecorderPluginProcessor::changeProgramName (int index, const juce::String& newName)
 {
 }
 
 //==============================================================================
-void AudioMidiRecorderPluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void DinvernoAudioMidiRecorderPluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
@@ -107,7 +107,7 @@ void AudioMidiRecorderPluginProcessor::prepareToPlay (double sampleRate, int sam
     writeThread.startThread();
 }
 
-void AudioMidiRecorderPluginProcessor::releaseResources()
+void DinvernoAudioMidiRecorderPluginProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
@@ -116,7 +116,7 @@ void AudioMidiRecorderPluginProcessor::releaseResources()
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool AudioMidiRecorderPluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool DinvernoAudioMidiRecorderPluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
   #if JucePlugin_IsMidiEffect
     juce::ignoreUnused (layouts);
@@ -139,7 +139,7 @@ bool AudioMidiRecorderPluginProcessor::isBusesLayoutSupported (const BusesLayout
 }
 #endif
 
-void AudioMidiRecorderPluginProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+void DinvernoAudioMidiRecorderPluginProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     // Record Midi Data to Sequence
     if (recordingMidi){
@@ -172,7 +172,7 @@ void AudioMidiRecorderPluginProcessor::processBlock (juce::AudioBuffer<float>& b
     }
 }
 
-void AudioMidiRecorderPluginProcessor::startRecordingAudio (const File& audioFile) {
+void DinvernoAudioMidiRecorderPluginProcessor::startRecordingAudio (const File& audioFile) {
     // Exit if already recording
     if (recordingAudio)
         return;
@@ -229,7 +229,7 @@ void AudioMidiRecorderPluginProcessor::startRecordingAudio (const File& audioFil
     recordingAudio = true;
 }
 
-void AudioMidiRecorderPluginProcessor::stopRecordingAudio () {
+void DinvernoAudioMidiRecorderPluginProcessor::stopRecordingAudio () {
     
     // First, clear this pointer to stop the audio callback from using our writer object..
     {
@@ -246,7 +246,7 @@ void AudioMidiRecorderPluginProcessor::stopRecordingAudio () {
     recordingAudio = false;
 }
 
-void AudioMidiRecorderPluginProcessor::startRecordingMidi (const File& midiFile) {
+void DinvernoAudioMidiRecorderPluginProcessor::startRecordingMidi (const File& midiFile) {
     // Exit if already recording
     if (recordingMidi)
         return;
@@ -264,7 +264,7 @@ void AudioMidiRecorderPluginProcessor::startRecordingMidi (const File& midiFile)
     recordingMidi = true;
 }
 
-void AudioMidiRecorderPluginProcessor::stopRecordingMidi () {
+void DinvernoAudioMidiRecorderPluginProcessor::stopRecordingMidi () {
     // Exit if not recording
     if (!recordingMidi)
         return;
@@ -280,25 +280,25 @@ void AudioMidiRecorderPluginProcessor::stopRecordingMidi () {
 
 
 //==============================================================================
-bool AudioMidiRecorderPluginProcessor::hasEditor() const
+bool DinvernoAudioMidiRecorderPluginProcessor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)
 }
 
-juce::AudioProcessorEditor* AudioMidiRecorderPluginProcessor::createEditor()
+juce::AudioProcessorEditor* DinvernoAudioMidiRecorderPluginProcessor::createEditor()
 {
-    return new AudioMidiRecorderPluginProcessorEditor (*this);
+    return new DinvernoAudioMidiRecorderPluginProcessorEditor (*this);
 }
 
 //==============================================================================
-void AudioMidiRecorderPluginProcessor::getStateInformation (juce::MemoryBlock& destData)
+void DinvernoAudioMidiRecorderPluginProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 }
 
-void AudioMidiRecorderPluginProcessor::setStateInformation (const void* data, int sizeInBytes)
+void DinvernoAudioMidiRecorderPluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
@@ -308,5 +308,5 @@ void AudioMidiRecorderPluginProcessor::setStateInformation (const void* data, in
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new AudioMidiRecorderPluginProcessor();
+    return new DinvernoAudioMidiRecorderPluginProcessor();
 }

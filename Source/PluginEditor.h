@@ -14,12 +14,12 @@
 //==============================================================================
 /**
 */
-class AudioMidiRecorderPluginProcessorEditor  : public AudioProcessorEditor,
+class DinvernoAudioMidiRecorderPluginProcessorEditor  : public AudioProcessorEditor,
                                         public Button::Listener
 {
 public:
-    AudioMidiRecorderPluginProcessorEditor (AudioMidiRecorderPluginProcessor&);
-    ~AudioMidiRecorderPluginProcessorEditor() override;
+    DinvernoAudioMidiRecorderPluginProcessorEditor (DinvernoAudioMidiRecorderPluginProcessor&);
+    ~DinvernoAudioMidiRecorderPluginProcessorEditor() override;
 
     //==============================================================================
     void paint (juce::Graphics&) override;
@@ -33,7 +33,7 @@ public:
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
-    AudioMidiRecorderPluginProcessor& audioProcessor;
+    DinvernoAudioMidiRecorderPluginProcessor& audioProcessor;
 
     // GUI Objects
     //juce::Slider midiVolume; // [1]
@@ -46,5 +46,5 @@ private:
     File audioRecordingFile;
     File midiRecordingFile;
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioMidiRecorderPluginProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DinvernoAudioMidiRecorderPluginProcessorEditor)
 };

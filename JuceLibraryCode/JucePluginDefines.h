@@ -38,10 +38,10 @@
  #define JucePlugin_Enable_IAA             0
 #endif
 #ifndef  JucePlugin_Name
- #define JucePlugin_Name                   "AudioMidiRecorder"
+ #define JucePlugin_Name                   "DinvernoAudioMidiRecorder"
 #endif
 #ifndef  JucePlugin_Desc
- #define JucePlugin_Desc                   "AudioMidiRecorder"
+ #define JucePlugin_Desc                   "DinvernoAudioMidiRecorder"
 #endif
 #ifndef  JucePlugin_Manufacturer
  #define JucePlugin_Manufacturer           "SensiLab"
@@ -98,16 +98,16 @@
  #define JucePlugin_AUSubType              JucePlugin_PluginCode
 #endif
 #ifndef  JucePlugin_AUExportPrefix
- #define JucePlugin_AUExportPrefix         AudioMidiRecorderAU
+ #define JucePlugin_AUExportPrefix         DinvernoAudioMidiRecorderAU
 #endif
 #ifndef  JucePlugin_AUExportPrefixQuoted
- #define JucePlugin_AUExportPrefixQuoted   "AudioMidiRecorderAU"
+ #define JucePlugin_AUExportPrefixQuoted   "DinvernoAudioMidiRecorderAU"
 #endif
 #ifndef  JucePlugin_AUManufacturerCode
  #define JucePlugin_AUManufacturerCode     JucePlugin_ManufacturerCode
 #endif
 #ifndef  JucePlugin_CFBundleIdentifier
- #define JucePlugin_CFBundleIdentifier     com.sensilab.AudioMidiRecorder
+ #define JucePlugin_CFBundleIdentifier     com.sensilab.DinvernoAudioMidiRecorder
 #endif
 #ifndef  JucePlugin_RTASCategory
  #define JucePlugin_RTASCategory           0
@@ -125,7 +125,7 @@
  #define JucePlugin_RTASDisableMultiMono   0
 #endif
 #ifndef  JucePlugin_AAXIdentifier
- #define JucePlugin_AAXIdentifier          com.yourcompany.AudioMidiRecorder
+ #define JucePlugin_AAXIdentifier          com.yourcompany.DinvernoAudioMidiRecorder
 #endif
 #ifndef  JucePlugin_AAXManufacturerCode
  #define JucePlugin_AAXManufacturerCode    JucePlugin_ManufacturerCode
@@ -149,7 +149,7 @@
  #define JucePlugin_IAASubType             JucePlugin_PluginCode
 #endif
 #ifndef  JucePlugin_IAAName
- #define JucePlugin_IAAName                "SensiLab: AudioMidiRecorder"
+ #define JucePlugin_IAAName                "SensiLab: DinvernoAudioMidiRecorder"
 #endif
 #ifndef  JucePlugin_VSTNumMidiInputs
  #define JucePlugin_VSTNumMidiInputs       16

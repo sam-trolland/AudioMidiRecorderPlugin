@@ -10,7 +10,7 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-AudioMidiRecorderPluginProcessorEditor::AudioMidiRecorderPluginProcessorEditor (AudioMidiRecorderPluginProcessor& p)
+DinvernoAudioMidiRecorderPluginProcessorEditor::DinvernoAudioMidiRecorderPluginProcessorEditor (DinvernoAudioMidiRecorderPluginProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
     // Make sure that before the constructor has finished, you've set the
@@ -32,16 +32,16 @@ AudioMidiRecorderPluginProcessorEditor::AudioMidiRecorderPluginProcessorEditor (
     // Setup Record Button
     addAndMakeVisible(recordButton);
     recordButton.addListener(this);
-    recordButton.setButtonText("Record");
+    recordButton.setButtonText("Start Recording");
     recordButton.setColour(TextButton::buttonColourId,Colours::green);
 }
 
-AudioMidiRecorderPluginProcessorEditor::~AudioMidiRecorderPluginProcessorEditor()
+DinvernoAudioMidiRecorderPluginProcessorEditor::~DinvernoAudioMidiRecorderPluginProcessorEditor()
 {
 }
 
 //==============================================================================
-void AudioMidiRecorderPluginProcessorEditor::paint (juce::Graphics& g)
+void DinvernoAudioMidiRecorderPluginProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
@@ -50,7 +50,7 @@ void AudioMidiRecorderPluginProcessorEditor::paint (juce::Graphics& g)
     g.drawFittedText ("Midi Volume", 0, 0, getWidth(), 30, juce::Justification::centred, 1);
 }
 
-void AudioMidiRecorderPluginProcessorEditor::resized()
+void DinvernoAudioMidiRecorderPluginProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
@@ -60,7 +60,7 @@ void AudioMidiRecorderPluginProcessorEditor::resized()
     recordButton.setBounds(0,0,getWidth(),getHeight());
 }
 
-void AudioMidiRecorderPluginProcessorEditor::buttonClicked (Button* button)
+void DinvernoAudioMidiRecorderPluginProcessorEditor::buttonClicked (Button* button)
 {
     if (!recording){
         // Start Recording
@@ -93,7 +93,7 @@ void AudioMidiRecorderPluginProcessorEditor::buttonClicked (Button* button)
         audioProcessor.stopRecordingMidi();
         
         // Update GUI
-        recordButton.setButtonText("Record");
+        recordButton.setButtonText("Start Recording");
         recordButton.setColour(TextButton::buttonColourId,Colours::green);
         recording = false;
     }
