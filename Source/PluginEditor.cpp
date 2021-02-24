@@ -64,27 +64,37 @@ void NewProjectAudioProcessorEditor::buttonClicked (Button* button)
 {
     if (!recording){
         // Start Recording
+        // Setup Recording Driectory
         auto docsDir = File::getSpecialLocation (File::userDocumentsDirectory);
         auto parentDir = File(docsDir.getFullPathName()+"/DinvernoRecordings" );
         parentDir.createDirectory();
+        
+        // Audio Recording File (Swap between .wav and .ogg formats here)
         audioRecordingFile = parentDir.getNonexistentChildFile("dinverno_system_recording", ".wav");    //Wav Audio File Format
         //audioRecordingFile = parentDir.getNonexistentChildFile("dinverno_system_recording", ".ogg");  //OGG Audio File Format
-        midiRecordingFile = parentDir.getNonexistentChildFile("dinverno_system_recording", ".mid");
         
+        // Midi Recording File (same name as audio file - will overwrite if file exists)
+        midiRecordingFile = parentDir.getChildFile(audioRecordingFile.getFileNameWithoutExtension()+".mid");
         
+        // Tell Audio Processor to start recording
+        audioProcessor.startRecordingAudio(audioRecordingFile);
+        audioProcessor.startRecordingMidi(midiRecordingFile);
         
+        // Update GUI
         recordButton.setButtonText("Stop Recording");
         recordButton.setColour(TextButton::buttonColourId,Colours::red);
         recording = true;
-        audioProcessor.startRecordingAudio(audioRecordingFile);
-        //audioProcessor.startRecordingMidi(midiRecordingFile);
+        
     }else{
         // Stop Recording
+        
+        // Tell Audio Processor to Stop Recording
+        audioProcessor.stopRecordingAudio();
+        audioProcessor.stopRecordingMidi();
+        
+        // Update GUI
         recordButton.setButtonText("Record");
         recordButton.setColour(TextButton::buttonColourId,Colours::green);
         recording = false;
-        //audioProcessor.setRecording(recording);
-        audioProcessor.stopRecordingAudio();
-        //audioProcessor.stopRecordingMidi();
     }
 }

@@ -20,7 +20,8 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ),
-        recording (false),
+        recordingAudio(false),
+        recordingMidi(false),
         writeThread("write thread")
 #endif
 {
@@ -104,19 +105,6 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     
     // Start Audio Recording Thread
     writeThread.startThread();
-    
-    
-    if (writer == NULL){
-        
-        // Moved to startAudioRecording
-        /*
-        writeThread.startThread();
-        stream = new FileOutputStream (File::getSpecialLocation (File::userDocumentsDirectory).getChildFile ("MLRecordings/rec.wav"));
-        WavAudioFormat format;
-        writer = format.createWriterFor (stream, sampleRate, 2, 24, StringPairArray(), 0);
-        threaded = new AudioFormatWriter::ThreadedWriter (writer, writeThread, 16384);
-         */
-    }
 }
 
 void NewProjectAudioProcessor::releaseResources()
@@ -125,7 +113,6 @@ void NewProjectAudioProcessor::releaseResources()
     // spare memory, etc.
     stopRecordingAudio();
     writeThread.stopThread (1000);
-    writer = nullptr;
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -154,76 +141,44 @@ bool NewProjectAudioProcessor::isBusesLayoutSupported (const BusesLayout& layout
 
 void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    
-    if (recording){
+    // Record Midi Data to Sequence
+    if (recordingMidi){
+        // Initialise and clear variables
         int numSamples = buffer.getNumSamples();
         double numSecondsInThisBlock = numSamples / mSampleRate;
         double endTime = recordingTime + numSecondsInThisBlock;
+
         
-        // Initialise and clear variables
-        //buffer.clear();
+        // Iterate over midi Messages add to midi sequence recording
         int time;
         juce::MidiMessage m;
-        
-        // Iterate over midi Messages and edit 'noteOn' velocities
         for (juce::MidiBuffer::Iterator i (midiMessages); i.getNextEvent(m, time);)
         {
-            double eventTime = recordingTime + time*numSecondsInThisBlock;
-            
-            //Combo1: double mTime = 100 * (Time::getMillisecondCounterHiRes() - recordingTime);
-            //Combo1: m.setTimeStamp(mTime);
-            //Combo1: midiSequence.addEvent(m,0);
-            
-            //Combo2: double offset = (double)time/(double)numSamples * numSecondsInThisBlock;
-            //Combo2: double mTime = 192 * (Time::getMillisecondCounterHiRes()*0.001 - recordingStartTime + offset);
-            
+            // Get time of midi event and convert into ticks per quarter note (1s = 192 ticks)
             double offset = (double)time/(double)numSamples * numSecondsInThisBlock;
             double mTime = 192 * (recordingTime + offset);
             m.setTimeStamp(mTime);
             midiSequence.addEvent(m,0);
-            
-            if (m.isNoteOn())
-            {
-                //juce::uint8 newVel = (juce::uint8) noteOnVel;
-                //m = juce::MidiMessage::noteOn(m.getChannel(), m.getNoteNumber(), newVel);
-                //midiSequence.addEvent(m,0);
-            }else if (m.isNoteOff())
-            {
-                //midiSequence.addEvent(m,0);
-            }
-            else if (m.isAftertouch())
-            {
-            }
-            else if (m.isPitchWheel())
-            {
-            }
-            
         }
-        
-        
         recordingTime = endTime;
     }
     
-    //if (threaded && recording) {
-    //threaded->write(buffer.getArrayOfReadPointers (), buffer.getNumSamples());
-    //}
-    
+    // Record Audio Data to file (in seperate thread)
     if (recordingAudio){
         const ScopedLock sl (writerLock);
         if (activeWriter.load() != nullptr) {
-            //threadedWriter->write(buffer.getArrayOfReadPointers (), buffer.getNumSamples() );
-            //activeWriter.load()->write(<#const float *const *data#>, <#int numSamples#>);
             activeWriter.load()->write (buffer.getArrayOfReadPointers (), buffer.getNumSamples());
         }
     }
 }
 
 void NewProjectAudioProcessor::startRecordingAudio (const File& audioFile) {
+    // Exit if already recording
+    if (recordingAudio)
+        return;
     
+    // Clear and reset writers
     stopRecordingAudio();
-        
-    //stream = new FileOutputStream (File::getSpecialLocation (File::userDocumentsDirectory).getChildFile ("MLRecordings/rec.wav"));
-    //stream = audioFile.createOutputStream();
     
     // Create an OutputStream to write to our destination file...
     audioFile.deleteFile();
@@ -268,16 +223,10 @@ void NewProjectAudioProcessor::startRecordingAudio (const File& audioFile) {
                 
             }
         }
-        
-        // Writer
-        //if (auto OggWriter = oggFormat.createWriterFor (audioStream.get(),sampleRate,1,16,{},8) ) {
-        //if (auto audioWriter = format.createWriterFor (stream.get(), mSampleRate, 2, 24, StringPairArray(), 0) ) {
-
-
     }
     
+    // Update recording flag
     recordingAudio = true;
-    
 }
 
 void NewProjectAudioProcessor::stopRecordingAudio () {
@@ -293,95 +242,42 @@ void NewProjectAudioProcessor::stopRecordingAudio () {
     // the audio callback while this happens.
     threadedWriter.reset();
 
-
+    // Update recording flag
     recordingAudio = false;
 }
 
 void NewProjectAudioProcessor::startRecordingMidi (const File& midiFile) {
+    // Exit if already recording
+    if (recordingMidi)
+        return;
+    
+    // Clear file before starting recording
+    midiFile.deleteFile();
+    
+    // Initialise variables for recording Midi input to file
+    midiStream = midiFile.createOutputStream();
+    midiSequence.clear();
+    midiRecordingFile.clear();
+    recordingTime=0;
+    
+    // Update recording Flag
     recordingMidi = true;
 }
 
 void NewProjectAudioProcessor::stopRecordingMidi () {
+    // Exit if not recording
+    if (!recordingMidi)
+        return;
+    
+    // Add recorded Midi Sequence and write to recording file
+    midiRecordingFile.addTrack(midiSequence);
+    midiRecordingFile.setTicksPerQuarterNote(96);
+    midiRecordingFile.writeTo(*midiStream,0);
+    
+    // Update recording file
     recordingMidi = false;
 }
 
-
-void NewProjectAudioProcessor::setRecording (bool rec) {
-    if (!recording && rec){
-        // Start Recording
-        midiSequence.clear();
-        midiRecordingFile.clear();
-        
-        // Combo1: recordingTime=Time::getMillisecondCounterHiRes();
-        recordingTime=0;        //Time::getMillisecondCounterHiRes();
-        recordingStartTime=Time::getMillisecondCounterHiRes()*0.001;
-    }else if (recording && !rec){
-        // End Recording
-        //midiSequence.addEvent(MidiMessage::endOfTrack(),recordingTime);
-        //midiSequence.updateMatchedPairs();
-        //midiSequence.sort();
-        
-        MidiMessageSequence midiSequence2 = MidiMessageSequence();
-        //Messsage Generation
-        int midiChannel = 10;
-        double startTime= Time::getMillisecondCounterHiRes()*0.001;
-        int c3 = 60;
-        MidiMessage message = MidiMessage::noteOn(1, c3, (uint8)100);
-        message.setTimeStamp(Time::getMillisecondCounterHiRes() * 0.001 - startTime);
-        //Extra noteOn
-        MidiMessage message1 = MidiMessage::noteOn(1, c3+7, (uint8)100);
-        message1.setTimeStamp(message.getTimeStamp());
-        MidiMessage messageOff = MidiMessage::noteOff(message.getChannel(), message.getNoteNumber());
-        //If 96 ticks per quarter note then 192 are 2 beats
-        messageOff.setTimeStamp(message.getTimeStamp() + 192);
-        //Extra noteOff
-        MidiMessage messageOff1 = MidiMessage::noteOff(message1.getChannel(), message1.getNoteNumber());
-        messageOff1.setTimeStamp(message1.getTimeStamp() + 96);
-        
-        double testTime = message.getTimeStamp() + 192;
-        double testTime2 = startTime + 192;
-        double testTime3 = startTime*0.001 + 192;
-        
-        MidiMessage message2 = MidiMessage::noteOn(1, c3+9, (uint8)100);
-        message2.setTimeStamp(192);
-        MidiMessage messageOff2 = MidiMessage::noteOff(message2.getChannel(), message2.getNoteNumber());
-        messageOff2.setTimeStamp(message2.getTimeStamp() + 192);
-
-        
-        midiSequence2.addEvent(message, 0);
-        midiSequence2.addEvent(message1, 0);
-        midiSequence2.addEvent(messageOff, 0);
-        midiSequence2.addEvent(messageOff1, 0);
-        midiSequence2.addEvent(message2, 0);
-        midiSequence2.addEvent(messageOff2, 0);
-        
-        for (int i=0; i<midiSequence.getNumEvents(); i++){
-            auto eventTime = midiSequence.getEventTime(i);
-            auto eventOffTime = midiSequence.getTimeOfMatchingKeyUp(i);
-            auto event = midiSequence.getEventPointer(i);
-            String desc = event->message.getDescription();
-            auto eventTimestamp = event->message.getTimeStamp();
-            auto upTime = midiSequence.getTimeOfMatchingKeyUp(i);
-            int test = 1;
-        }
-        
-        midiRecordingFile.addTrack(midiSequence);
-        //Combo1: midiRecordingFile.setSmpteTimeFormat (25, 40);
-        //midiRecordingFile.setSmpteTimeFormat (25, 40);
-        midiRecordingFile.setTicksPerQuarterNote(96);
-        
-        File midiFileOut = File::getSpecialLocation (File::userDocumentsDirectory).getChildFile ("MLRecordings/rec.mid");
-        FileOutputStream midiStreamOut (midiFileOut);
-        //midiStream = FileOutputStream (File::getSpecialLocation (File::userDocumentsDirectory).getChildFile ("test.midi"));
-        midiRecordingFile.writeTo(midiStreamOut,0);
-        
-        //Audio
-        stream->flush();
-        writer->flush();
-        
-    }
-    recording = rec;
-}
 
 //==============================================================================
 bool NewProjectAudioProcessor::hasEditor() const

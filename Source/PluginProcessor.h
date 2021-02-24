@@ -54,27 +54,25 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     //==============================================================================
-    // Recording
+    // Audio and Midi Recording
     void startRecordingAudio (const File& audioFile);
     void stopRecordingAudio ();
     void startRecordingMidi (const File& midiFile);
     void stopRecordingMidi ();
-    void setRecording(bool rec);
+    
+private:
+    double mSampleRate;
+    
+    // Midi Recording
+    bool recordingMidi;
+    double recordingTime;
+    std::unique_ptr<FileOutputStream> midiStream;
     MidiFile midiRecordingFile;
     MidiMessageSequence midiSequence;
     
-private:
+    // Audio Recording
     bool recordingAudio;
-    bool recordingMidi;
-    bool recording;
-    double recordingTime;
-    double recordingStartTime;
-    double mSampleRate;
     TimeSliceThread writeThread;
-    std::unique_ptr<FileOutputStream> stream;
-    std::unique_ptr<FileOutputStream> midiStream;
-    std::unique_ptr<AudioFormatWriter> writer;
-    //std::unique_ptr<AudioFormatWriter::ThreadedWriter> threaded;
     std::unique_ptr<AudioFormatWriter::ThreadedWriter> threadedWriter;
     CriticalSection writerLock;
     std::atomic<AudioFormatWriter::ThreadedWriter*> activeWriter { nullptr };
