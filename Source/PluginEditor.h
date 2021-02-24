@@ -14,12 +14,12 @@
 //==============================================================================
 /**
 */
-class NewProjectAudioProcessorEditor  : public AudioProcessorEditor,
+class AudioMidiRecorderPluginProcessorEditor  : public AudioProcessorEditor,
                                         public Button::Listener
 {
 public:
-    NewProjectAudioProcessorEditor (NewProjectAudioProcessor&);
-    ~NewProjectAudioProcessorEditor() override;
+    AudioMidiRecorderPluginProcessorEditor (AudioMidiRecorderPluginProcessor&);
+    ~AudioMidiRecorderPluginProcessorEditor() override;
 
     //==============================================================================
     void paint (juce::Graphics&) override;
@@ -33,7 +33,7 @@ public:
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
-    NewProjectAudioProcessor& audioProcessor;
+    AudioMidiRecorderPluginProcessor& audioProcessor;
 
     // GUI Objects
     //juce::Slider midiVolume; // [1]
@@ -46,5 +46,5 @@ private:
     File audioRecordingFile;
     File midiRecordingFile;
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NewProjectAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioMidiRecorderPluginProcessorEditor)
 };

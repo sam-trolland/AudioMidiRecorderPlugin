@@ -10,7 +10,7 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-NewProjectAudioProcessor::NewProjectAudioProcessor()
+AudioMidiRecorderPluginProcessor::AudioMidiRecorderPluginProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
@@ -30,17 +30,17 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
     recordingTime = 0;
 }
 
-NewProjectAudioProcessor::~NewProjectAudioProcessor()
+AudioMidiRecorderPluginProcessor::~AudioMidiRecorderPluginProcessor()
 {
 }
 
 //==============================================================================
-const juce::String NewProjectAudioProcessor::getName() const
+const juce::String AudioMidiRecorderPluginProcessor::getName() const
 {
     return JucePlugin_Name;
 }
 
-bool NewProjectAudioProcessor::acceptsMidi() const
+bool AudioMidiRecorderPluginProcessor::acceptsMidi() const
 {
    #if JucePlugin_WantsMidiInput
     return true;
@@ -49,7 +49,7 @@ bool NewProjectAudioProcessor::acceptsMidi() const
    #endif
 }
 
-bool NewProjectAudioProcessor::producesMidi() const
+bool AudioMidiRecorderPluginProcessor::producesMidi() const
 {
    #if JucePlugin_ProducesMidiOutput
     return true;
@@ -58,7 +58,7 @@ bool NewProjectAudioProcessor::producesMidi() const
    #endif
 }
 
-bool NewProjectAudioProcessor::isMidiEffect() const
+bool AudioMidiRecorderPluginProcessor::isMidiEffect() const
 {
    #if JucePlugin_IsMidiEffect
     return true;
@@ -67,37 +67,37 @@ bool NewProjectAudioProcessor::isMidiEffect() const
    #endif
 }
 
-double NewProjectAudioProcessor::getTailLengthSeconds() const
+double AudioMidiRecorderPluginProcessor::getTailLengthSeconds() const
 {
     return 0.0;
 }
 
-int NewProjectAudioProcessor::getNumPrograms()
+int AudioMidiRecorderPluginProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
                 // so this should be at least 1, even if you're not really implementing programs.
 }
 
-int NewProjectAudioProcessor::getCurrentProgram()
+int AudioMidiRecorderPluginProcessor::getCurrentProgram()
 {
     return 0;
 }
 
-void NewProjectAudioProcessor::setCurrentProgram (int index)
+void AudioMidiRecorderPluginProcessor::setCurrentProgram (int index)
 {
 }
 
-const juce::String NewProjectAudioProcessor::getProgramName (int index)
+const juce::String AudioMidiRecorderPluginProcessor::getProgramName (int index)
 {
     return {};
 }
 
-void NewProjectAudioProcessor::changeProgramName (int index, const juce::String& newName)
+void AudioMidiRecorderPluginProcessor::changeProgramName (int index, const juce::String& newName)
 {
 }
 
 //==============================================================================
-void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void AudioMidiRecorderPluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
@@ -107,7 +107,7 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     writeThread.startThread();
 }
 
-void NewProjectAudioProcessor::releaseResources()
+void AudioMidiRecorderPluginProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
@@ -116,7 +116,7 @@ void NewProjectAudioProcessor::releaseResources()
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool NewProjectAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool AudioMidiRecorderPluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
   #if JucePlugin_IsMidiEffect
     juce::ignoreUnused (layouts);
@@ -139,7 +139,7 @@ bool NewProjectAudioProcessor::isBusesLayoutSupported (const BusesLayout& layout
 }
 #endif
 
-void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+void AudioMidiRecorderPluginProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     // Record Midi Data to Sequence
     if (recordingMidi){
@@ -172,7 +172,7 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     }
 }
 
-void NewProjectAudioProcessor::startRecordingAudio (const File& audioFile) {
+void AudioMidiRecorderPluginProcessor::startRecordingAudio (const File& audioFile) {
     // Exit if already recording
     if (recordingAudio)
         return;
@@ -229,7 +229,7 @@ void NewProjectAudioProcessor::startRecordingAudio (const File& audioFile) {
     recordingAudio = true;
 }
 
-void NewProjectAudioProcessor::stopRecordingAudio () {
+void AudioMidiRecorderPluginProcessor::stopRecordingAudio () {
     
     // First, clear this pointer to stop the audio callback from using our writer object..
     {
@@ -246,7 +246,7 @@ void NewProjectAudioProcessor::stopRecordingAudio () {
     recordingAudio = false;
 }
 
-void NewProjectAudioProcessor::startRecordingMidi (const File& midiFile) {
+void AudioMidiRecorderPluginProcessor::startRecordingMidi (const File& midiFile) {
     // Exit if already recording
     if (recordingMidi)
         return;
@@ -264,7 +264,7 @@ void NewProjectAudioProcessor::startRecordingMidi (const File& midiFile) {
     recordingMidi = true;
 }
 
-void NewProjectAudioProcessor::stopRecordingMidi () {
+void AudioMidiRecorderPluginProcessor::stopRecordingMidi () {
     // Exit if not recording
     if (!recordingMidi)
         return;
@@ -280,25 +280,25 @@ void NewProjectAudioProcessor::stopRecordingMidi () {
 
 
 //==============================================================================
-bool NewProjectAudioProcessor::hasEditor() const
+bool AudioMidiRecorderPluginProcessor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)
 }
 
-juce::AudioProcessorEditor* NewProjectAudioProcessor::createEditor()
+juce::AudioProcessorEditor* AudioMidiRecorderPluginProcessor::createEditor()
 {
-    return new NewProjectAudioProcessorEditor (*this);
+    return new AudioMidiRecorderPluginProcessorEditor (*this);
 }
 
 //==============================================================================
-void NewProjectAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
+void AudioMidiRecorderPluginProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 }
 
-void NewProjectAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void AudioMidiRecorderPluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
@@ -308,5 +308,5 @@ void NewProjectAudioProcessor::setStateInformation (const void* data, int sizeIn
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new NewProjectAudioProcessor();
+    return new AudioMidiRecorderPluginProcessor();
 }

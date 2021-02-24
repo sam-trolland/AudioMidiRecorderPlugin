@@ -10,7 +10,7 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioProcessor& p)
+AudioMidiRecorderPluginProcessorEditor::AudioMidiRecorderPluginProcessorEditor (AudioMidiRecorderPluginProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
     // Make sure that before the constructor has finished, you've set the
@@ -36,12 +36,12 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioP
     recordButton.setColour(TextButton::buttonColourId,Colours::green);
 }
 
-NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor()
+AudioMidiRecorderPluginProcessorEditor::~AudioMidiRecorderPluginProcessorEditor()
 {
 }
 
 //==============================================================================
-void NewProjectAudioProcessorEditor::paint (juce::Graphics& g)
+void AudioMidiRecorderPluginProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
@@ -50,7 +50,7 @@ void NewProjectAudioProcessorEditor::paint (juce::Graphics& g)
     g.drawFittedText ("Midi Volume", 0, 0, getWidth(), 30, juce::Justification::centred, 1);
 }
 
-void NewProjectAudioProcessorEditor::resized()
+void AudioMidiRecorderPluginProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
@@ -60,17 +60,17 @@ void NewProjectAudioProcessorEditor::resized()
     recordButton.setBounds(0,0,getWidth(),getHeight());
 }
 
-void NewProjectAudioProcessorEditor::buttonClicked (Button* button)
+void AudioMidiRecorderPluginProcessorEditor::buttonClicked (Button* button)
 {
     if (!recording){
         // Start Recording
         // Setup Recording Driectory
         auto docsDir = File::getSpecialLocation (File::userDocumentsDirectory);
-        auto parentDir = File(docsDir.getFullPathName()+"/DinvernoRecordings" );
+        auto parentDir = File(docsDir.getFullPathName()+"/AudioMidiRecordings" );
         parentDir.createDirectory();
         
         // Audio Recording File (Swap between .wav and .ogg formats here)
-        audioRecordingFile = parentDir.getNonexistentChildFile("dinverno_system_recording", ".wav");    //Wav Audio File Format
+        audioRecordingFile = parentDir.getNonexistentChildFile("recording", ".wav");    //Wav Audio File Format
         //audioRecordingFile = parentDir.getNonexistentChildFile("dinverno_system_recording", ".ogg");  //OGG Audio File Format
         
         // Midi Recording File (same name as audio file - will overwrite if file exists)
