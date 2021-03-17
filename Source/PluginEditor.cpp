@@ -15,25 +15,17 @@ DinvernoAudioMidiRecorderPluginProcessorEditor::DinvernoAudioMidiRecorderPluginP
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (200, 200);
-    
-    // GUI Elements
-    /*
-    midiVolume.setSliderStyle(juce::Slider::LinearBarVertical);
-    midiVolume.setRange(0.0, 127.0, 1.0);
-    midiVolume.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
-    midiVolume.setPopupDisplayEnabled(true, false, this);
-    midiVolume.setTextValueSuffix(" Volume");
-    midiVolume.setValue(1.0);
-    addAndMakeVisible(&midiVolume); // Add control to GUI
-    midiVolume.addListener(this);
-    */
+    setSize (200, 100);
     
     // Setup Record Button
     addAndMakeVisible(recordButton);
     recordButton.addListener(this);
     recordButton.setButtonText("Start Recording");
     recordButton.setColour(TextButton::buttonColourId,Colours::green);
+    
+    // Music Circle Login Manager
+    loggin.addEventListener(this);
+   
 }
 
 DinvernoAudioMidiRecorderPluginProcessorEditor::~DinvernoAudioMidiRecorderPluginProcessorEditor()
@@ -47,7 +39,6 @@ void DinvernoAudioMidiRecorderPluginProcessorEditor::paint (juce::Graphics& g)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
-    g.drawFittedText ("Midi Volume", 0, 0, getWidth(), 30, juce::Justification::centred, 1);
 }
 
 void DinvernoAudioMidiRecorderPluginProcessorEditor::resized()
@@ -56,22 +47,24 @@ void DinvernoAudioMidiRecorderPluginProcessorEditor::resized()
     // subcomponents in your editor..
     
     // GUI Components
-    //midiVolume.setBounds(40, 30, 20, getHeight() - 60);
     recordButton.setBounds(0,0,getWidth(),getHeight());
 }
 
 void DinvernoAudioMidiRecorderPluginProcessorEditor::buttonClicked (Button* button)
 {
-    if (!recording){
+    if (!recording && !uploading){
         // Start Recording
         // Setup Recording Driectory
-        auto docsDir = File::getSpecialLocation (File::userDocumentsDirectory);
+        auto docsDir = File::getSpecialLocation (File::userMusicDirectory); 
         auto parentDir = File(docsDir.getFullPathName()+"/AudioMidiRecordings" );
         parentDir.createDirectory();
         
+        Time dateTime = Time::getCurrentTime();
+        String dateTimeFormatted = dateTime.formatted("%Y-%m-%d_%H-%M-%S");
+        
         // Audio Recording File (Swap between .wav and .ogg formats here)
-        audioRecordingFile = parentDir.getNonexistentChildFile("recording", ".wav");    //Wav Audio File Format
-        //audioRecordingFile = parentDir.getNonexistentChildFile("dinverno_system_recording", ".ogg");  //OGG Audio File Format
+        //audioRecordingFile = parentDir.getNonexistentChildFile(dateTimeFormatted, ".wav");    //Wav Audio File Format
+        audioRecordingFile = parentDir.getNonexistentChildFile(dateTimeFormatted, ".ogg");  //OGG Audio File Format
         
         // Midi Recording File (same name as audio file - will overwrite if file exists)
         midiRecordingFile = parentDir.getChildFile(audioRecordingFile.getFileNameWithoutExtension()+".mid");
@@ -85,16 +78,73 @@ void DinvernoAudioMidiRecorderPluginProcessorEditor::buttonClicked (Button* butt
         recordButton.setColour(TextButton::buttonColourId,Colours::red);
         recording = true;
         
-    }else{
-        // Stop Recording
+    }else if (recording){
+        // Stop Recording - Start Uploading
         
         // Tell Audio Processor to Stop Recording
         audioProcessor.stopRecordingAudio();
         audioProcessor.stopRecordingMidi();
         
+        
+        
         // Update GUI
-        recordButton.setButtonText("Start Recording");
-        recordButton.setColour(TextButton::buttonColourId,Colours::green);
+        recordButton.setButtonText("Uploading...\n"+audioRecordingFile.getFileNameWithoutExtension());
+        recordButton.setColour(TextButton::buttonColourId,Colours::blue);
+        uploading = true;
         recording = false;
+        
+        // Music Circle (loggin for now)
+        loggin.loginToMC(default_username, default_password);
+
     }
+}
+
+void DinvernoAudioMidiRecorderPluginProcessorEditor::musicCircleEvent(MusicCircleEvent event)
+{
+    const MessageManagerLock mmLock;
+
+    /*
+    // lock the message thread
+    // as this func is called from another thread
+    // and we get assertion errors otherwise
+    const MessageManagerLock mmLock;
+    */
+    juce::String msg = "";
+     
+    switch(event){
+        case MusicCircleEvent::login_succeeded:
+            msg  << "\nLogged in. user id " << loggin.getUserId();
+            
+            if (uploading){
+                loggin.postMedia(audioRecordingFile.getFullPathName().toStdString(), [this](int result){
+                    std::cout << "MainComponent::recordingComplete postMedia callback result " << result << std::endl;
+                    //loggin.sendQueuedAnnotations();
+                });
+            }
+            break;
+        case MusicCircleEvent::login_failed:
+            msg << "\nFailed to login with user " << default_username;
+            break;
+        case MusicCircleEvent::media_upload_succeeded:
+            msg << "\nMedia upload succeeded. ";// + (usernameField.getText());
+            
+            if (uploading){
+                // Update GUI
+                recordButton.setButtonText("Start Recording");
+                recordButton.setColour(TextButton::buttonColourId,Colours::green);
+                uploading = false;
+            }
+            
+            break;
+        case MusicCircleEvent::logout_succeeded:
+            msg << "\nLogged out user " << default_username;
+            break;
+        case MusicCircleEvent::logout_failed:
+            msg << "\nFailed to logout user id " << loggin.getUserId();
+            break;
+            
+    }
+    //mcEventMonitor.setText(msg);
+    //    mcEventMonitor.repaint();
+    std::cout << msg << std::endl;
 }

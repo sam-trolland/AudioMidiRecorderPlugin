@@ -10,12 +10,16 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "MusicCircleClient.h"
+#include "LogginManager.h"
+
 
 //==============================================================================
 /**
 */
 class DinvernoAudioMidiRecorderPluginProcessorEditor  : public AudioProcessorEditor,
-                                        public Button::Listener
+                                        public Button::Listener,
+                                        public LogginListener
 {
 public:
     DinvernoAudioMidiRecorderPluginProcessorEditor (DinvernoAudioMidiRecorderPluginProcessor&);
@@ -29,22 +33,28 @@ public:
     // Listener interface for buttons
     void buttonClicked (Button* button) override;
     
+    //==============================================================================
+    /** LogginListener callback */
+    void musicCircleEvent(MusicCircleEvent event) override;
+    
     bool recording = false;
+    bool uploading = false;
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     DinvernoAudioMidiRecorderPluginProcessor& audioProcessor;
 
     // GUI Objects
-    //juce::Slider midiVolume; // [1]
     TextButton recordButton;
-    
-    // GUI Control
-    //void sliderValueChanged(juce::Slider* slider) override;
     
     // Recording
     File audioRecordingFile;
     File midiRecordingFile;
+    
+    //Music Circle
+    LogginManager loggin;
+    std::string default_username{"csys2"};
+    std::string default_password{"test123"};
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DinvernoAudioMidiRecorderPluginProcessorEditor)
 };

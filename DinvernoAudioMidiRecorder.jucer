@@ -6,6 +6,13 @@
               pluginManufacturer="SensiLab" bundleIdentifier="com.sensilab.DinvernoAudioMidiRecorder">
   <MAINGROUP id="HXEki4" name="DinvernoAudioMidiRecorder">
     <GROUP id="{5F118156-CCDA-AFC5-AB9C-0BD74955516B}" name="Source">
+      <FILE id="rKTjbv" name="MusicCircleClient.cpp" compile="1" resource="0"
+            file="Source/MusicCircleClient.cpp"/>
+      <FILE id="cOO5nr" name="MusicCircleClient.h" compile="0" resource="0"
+            file="Source/MusicCircleClient.h"/>
+      <FILE id="EPJjrJ" name="LogginManager.cpp" compile="1" resource="0"
+            file="Source/LogginManager.cpp"/>
+      <FILE id="V1bDgV" name="LogginManager.h" compile="0" resource="0" file="Source/LogginManager.h"/>
       <FILE id="jILnzF" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="aIIURJ" name="PluginProcessor.h" compile="0" resource="0"
