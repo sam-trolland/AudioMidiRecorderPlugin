@@ -83,6 +83,21 @@ void LogginManager::postMedia(std::string filePath, std::function<void(int)> res
     );    
 }
 
+void LogginManager::postMediaFile(std::string filePath, std::function<void(int)> resultCallback)
+{
+    threadPool.addJob(
+                      [filePath, resultCallback, this](){
+                          std::cout << "thread pool doing post Media on " << filePath << std::endl;
+                          //this->postMediaReal(filePath);
+                          
+                          int result = this->postMediaFileForThreadPool(audioId,filePath);
+                          sendEventToListeners(MusicCircleEvent::media_upload_succeeded);
+                          
+                          resultCallback(result);
+                      }
+                      );
+}
+
 std::string LogginManager::loginToMC(std::string username, std::string password)
 {
     std::queue<std::pair<std::string,std::string>> postFields;
@@ -292,7 +307,9 @@ juce::String LogginManager::httpGetRequestForThreadPool(const std::string &apiMe
         ));
         
         // Read Result
-        result = inStream->readEntireStreamAsString();
+        if (inStream != NULL) {
+            result = inStream->readEntireStreamAsString();
+        }
     }
     
     if(!postFields.empty()) {
@@ -308,7 +325,9 @@ juce::String LogginManager::httpGetRequestForThreadPool(const std::string &apiMe
         // inStream = dynamic_cast<WebInputStream*>(url.createInputStream(true));
         
         // Read Result
-        result = inStream->readEntireStreamAsString();
+        if (inStream != NULL) {
+            result = inStream->readEntireStreamAsString();
+        }
     }
     
     //juce::String result = inStream->readEntireStreamAsString();
@@ -379,3 +398,54 @@ unsigned int LogginManager::postMediaForThreadPool(std::string filePath)
     return 0;
 }
 
+/** upload media attachment for given mediaID, returns the id on MC or 0 if it fails*/
+unsigned int LogginManager::postMediaFileForThreadPool(std::string mediaId, std::string filePath)
+{
+    if (sessionId == "")
+    {
+        DBG("MusicCircleClient::postMediaFileForThreadPool Not logged in. call login first");
+        return false;
+    }
+    else
+    {
+        juce::URL url{ urlBase + "/media" + "/" + mediaId + "/files" };
+        url = url.withParameter("filename", juce::String(filePath));
+        url = url.withFileToUpload("files[]", File{ juce::String{filePath} }, "audio/midi");
+        juce::String extraHeaders{ "Cookie:PHPSESSID=" + sessionId };
+        
+        // "Content-Type: application/json"
+        std::unique_ptr<InputStream> inStream = (url.createInputStream(
+                                                                       //WebInputStream* inStream = dynamic_cast<WebInputStream*>(url.createInputStream(
+                                                                       true, // false means GET
+                                                                       nullptr, //    OpenStreamProgressCallback *     progressCallback = nullptr,
+                                                                       nullptr, //void *     progressCallbackContext = nullptr,
+                                                                       extraHeaders
+                                                                       //int     connectionTimeOutMs = 0,
+                                                                       //StringPairArray *     responseHeaders = nullptr,
+                                                                       //int *     statusCode = nullptr,
+                                                                       //int     numRedirectsToFollow = 5,
+                                                                       //String     httpRequestCmd = {}
+                                                                       ));
+        juce::String result = inStream->readEntireStreamAsString();
+        //delete inStream;
+        DBG(result);
+        
+        // update the audio id
+        var data = JSON::parse(result);
+        
+        if (data.hasProperty("id"))
+        {
+            juce::String mId = data["id"];
+            std::string midiId = mId.toStdString();
+            DBG("Saving posted midi file id " << midiId);
+        }
+        
+        
+        //var data = JSON::parse(result);
+        return true;
+    }
+    
+    return false;
+    
+    return 0;
+}

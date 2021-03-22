@@ -59,6 +59,8 @@ class LogginManager  {
     void logData(std::string improviser, std::string data);
     /** upload the sent audio file, returns the id on MC or 0 if it fails*/
     void postMedia(std::string filePath, std::function<void(int)> resultCallback);
+    /** upload file attachment for given mediaID, resultCallback called with result*/
+    void postMediaFile(std::string filePath, std::function<void(int)> resultCallback);
     /** resets the clock used for annotation timings*/
     void resetClockAndAnnotationQueue();
      /** iterates over the annotation queue and sends them over */
@@ -70,6 +72,7 @@ class LogginManager  {
     juce::String httpGetRequestForThreadPool(const std::string &apiMenu);
 
     unsigned int postMediaForThreadPool(std::string filePath);
+    unsigned int postMediaFileForThreadPool(std::string mediaId, std::string filePath);
     void setUsername(std::string usr);
     void setPassword(std::string pass);
 

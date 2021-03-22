@@ -13,9 +13,10 @@
 #include "MusicCircleClient.h"
 #include "LogginManager.h"
 
+enum class PluginState{ready, recording, mcLoggin, mcUploadAudio, mcUploadMidi, error};
 
 //==============================================================================
-/**
+/** PluginProcessorEditor: Handle Graphical User Interface and calls to LoginManager
 */
 class DinvernoAudioMidiRecorderPluginProcessorEditor  : public AudioProcessorEditor,
                                         public Button::Listener,
@@ -39,6 +40,7 @@ public:
     
     bool recording = false;
     bool uploading = false;
+    PluginState state;
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
@@ -46,6 +48,7 @@ private:
 
     // GUI Objects
     TextButton recordButton;
+    void updateButton(PluginState currentState, String msg);
     
     // Recording
     File audioRecordingFile;

@@ -34,7 +34,9 @@ class MusicCircleClient
      * audio file over to a newly uploaded audio file
     */
     bool transferAnnotations(unsigned int fromMediaId, unsigned int toMediaId);
-
+    /** post a media file to the sent track, returns true if it works */
+    bool postMediaFile(unsigned int id, std::string filePath);
+    
   private:
     std::string username;
     std::string password; 

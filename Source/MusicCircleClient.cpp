@@ -201,3 +201,41 @@ bool MusicCircleClient::transferAnnotations(unsigned int fromMediaId,
 {
     return false;
 }
+
+/** post a media file to the sent track, returns true if it works */
+bool MusicCircleClient::postMediaFile(unsigned int id, std::string filePath)
+{
+    if (sessionId == "0")
+    {
+        DBG("MusicCircleClient::postAnnotation Not logged in. call login first");
+        return false;
+    }
+    else
+    {
+        // Post Media File
+        juce::URL url{ apiUrl + "/media/" + std::to_string(id) + "/files" };
+        url = url.withParameter("filename", juce::String(filePath)); // ST: Not sure what this line does??
+        url = url.withFileToUpload("files[]", File{ juce::String{filePath} }, "audio/midi");
+        juce::String extraHeaders{ "Cookie:PHPSESSID=" + sessionId };
+        
+        // "Content-Type: application/json"
+        WebInputStream* inStream = dynamic_cast<WebInputStream*>(url.createInputStream(
+                                                                                       true, // false means GET
+                                                                                       nullptr, //    OpenStreamProgressCallback *     progressCallback = nullptr,
+                                                                                       nullptr, //void *     progressCallbackContext = nullptr,
+                                                                                       extraHeaders
+                                                                                       //int     connectionTimeOutMs = 0,
+                                                                                       //StringPairArray *     responseHeaders = nullptr,
+                                                                                       //int *     statusCode = nullptr,
+                                                                                       //int     numRedirectsToFollow = 5,
+                                                                                       //String     httpRequestCmd = {}
+                                                                                       ).get() );
+        juce::String result = inStream->readEntireStreamAsString();
+        delete inStream;
+        DBG(result);
+        //var data = JSON::parse(result);
+        return true;
+        
+    }
+    return false;
+}
