@@ -3,7 +3,8 @@
 <JUCERPROJECT id="aYLN8w" name="DinvernoAudioMidiRecorder" projectType="audioplug"
               useAppConfig="0" addUsingNamespaceToJuceHeader="1" displaySplashScreen="1"
               jucerFormatVersion="1" pluginCharacteristicsValue="pluginProducesMidiOut,pluginWantsMidiIn"
-              pluginManufacturer="SensiLab" bundleIdentifier="com.sensilab.DinvernoAudioMidiRecorder">
+              pluginManufacturer="SensiLab" bundleIdentifier="com.sensilab.DinvernoAudioMidiRecorder"
+              version="1.0.3">
   <MAINGROUP id="HXEki4" name="DinvernoAudioMidiRecorder">
     <GROUP id="{5F118156-CCDA-AFC5-AB9C-0BD74955516B}" name="Source">
       <FILE id="rKTjbv" name="MusicCircleClient.cpp" compile="1" resource="0"
