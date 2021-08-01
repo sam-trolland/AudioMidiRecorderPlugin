@@ -74,22 +74,26 @@ double DinvernoAudioMidiRecorderPluginProcessor::getTailLengthSeconds() const
 
 int DinvernoAudioMidiRecorderPluginProcessor::getNumPrograms()
 {
-    return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
-                // so this should be at least 1, even if you're not really implementing programs.
+    // NB: some hosts don't cope very well if you tell them there are 0 programs,
+    // so this should be at least 1, even if you're not really implementing programs.
+    return numPrograms > 0 ? numPrograms : 1;;
 }
 
 int DinvernoAudioMidiRecorderPluginProcessor::getCurrentProgram()
 {
-    return 0;
+    return curProgram;
 }
 
 void DinvernoAudioMidiRecorderPluginProcessor::setCurrentProgram (int index)
 {
+    if (curProgram != index){
+        curProgram = index;
+    }
 }
 
 const juce::String DinvernoAudioMidiRecorderPluginProcessor::getProgramName (int index)
 {
-    return {};
+    return programNames[index];
 }
 
 void DinvernoAudioMidiRecorderPluginProcessor::changeProgramName (int index, const juce::String& newName)

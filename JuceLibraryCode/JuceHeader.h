@@ -47,7 +47,7 @@ namespace ProjectInfo
 {
     const char* const  projectName    = "DinvernoAudioMidiRecorder";
     const char* const  companyName    = "";
-    const char* const  versionString  = "1.0.3";
-    const int          versionNumber  = 0x10003;
+    const char* const  versionString  = "2.2.0";
+    const int          versionNumber  = 0x20200;
 }
 #endif

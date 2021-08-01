@@ -95,10 +95,12 @@ void DinvernoAudioMidiRecorderPluginProcessorEditor::buttonClicked (Button* butt
         // Date-Time for FileNames
         Time dateTime = Time::getCurrentTime();
         String dateTimeFormatted = dateTime.formatted("%Y-%m-%d_%H-%M-%S");
+        String programMode = audioProcessor.getProgramName(audioProcessor.getCurrentProgram());
+        String fileName = dateTimeFormatted+"_"+programMode;
         
         // Audio Recording File (Swap between .wav and .ogg formats here)
-        //audioRecordingFile = parentDir.getNonexistentChildFile(dateTimeFormatted, ".wav");    //Wav Audio File Format
-        audioRecordingFile = parentDir.getNonexistentChildFile(dateTimeFormatted, ".ogg");  //OGG Audio File Format
+        //audioRecordingFile = parentDir.getNonexistentChildFile(fileName, ".wav");    //Wav Audio File Format
+        audioRecordingFile = parentDir.getNonexistentChildFile(fileName, ".ogg");  //OGG Audio File Format
         
         // Midi Recording File (same name as audio file - will overwrite if file exists)
         midiRecordingFile = parentDir.getChildFile(audioRecordingFile.getFileNameWithoutExtension()+".mid");

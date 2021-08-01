@@ -62,6 +62,9 @@ public:
     
 private:
     double mSampleRate;
+    const static int numPrograms = 4;
+    int curProgram = 0;
+    std::array<const String, numPrograms> programNames = {String("A"),String("B"),String("C"),String("D")};
     
     // Midi Recording
     bool recordingMidi;
